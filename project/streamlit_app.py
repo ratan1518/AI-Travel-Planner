@@ -256,10 +256,10 @@ def apply_custom_theme(theme_name: str) -> None:
             width: 100%;
             border-radius: 18px;
             border: 1px solid transparent;
-            color: #0f172a;
+            color: {"#0f172a" if theme_name == "Dark" else "#fffaf3"};
             font-weight: 800;
             padding: 0.85rem 1rem;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            background: {"linear-gradient(135deg, var(--accent), var(--accent-2))" if theme_name == "Dark" else "linear-gradient(135deg, #b76a42, #cc8453)"};
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }}
@@ -347,7 +347,7 @@ def apply_custom_theme(theme_name: str) -> None:
 
         .stTabs [aria-selected="true"] {{
             background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
-            color: #0f172a !important;
+            color: {"#0f172a" if theme_name == "Dark" else "#fffaf3"} !important;
             border-color: transparent !important;
             font-weight: 800 !important;
         }}
@@ -365,11 +365,21 @@ def apply_custom_theme(theme_name: str) -> None:
             background: var(--panel-solid) !important;
             color: var(--text) !important;
             border-bottom: 1px solid var(--border) !important;
+            opacity: 1 !important;
+            font-weight: 800 !important;
         }}
 
         details[data-testid="stExpander"] summary:hover,
         .streamlit-expanderHeader:hover {{
             color: var(--accent) !important;
+        }}
+
+        details[data-testid="stExpander"] summary p,
+        details[data-testid="stExpander"] summary span,
+        .streamlit-expanderHeader p,
+        .streamlit-expanderHeader span {{
+            color: var(--text) !important;
+            opacity: 1 !important;
         }}
 
         details[data-testid="stExpander"] > div {{
@@ -471,10 +481,13 @@ def show_simple_map(destination: str) -> None:
 def render_bullet_section(title: str, items: list[str]) -> None:
     if not items:
         return
-    with st.container(border=True):
-        st.markdown(f"### {title}")
-        for item in items:
-            st.markdown(f"- {item}")
+    st.markdown(f"### {title}")
+    columns = st.columns(2)
+    for index, item in enumerate(items):
+        with columns[index % 2]:
+            with st.container(border=True):
+                st.markdown(f"**{title[:-1] if title.endswith('s') else title}**")
+                st.caption(item)
 
 
 def render_hotel_section(hotels: list) -> None:
@@ -510,10 +523,14 @@ def render_hotel_section(hotels: list) -> None:
 def render_budget_section(breakdown: dict) -> None:
     if not breakdown:
         return
-    with st.container(border=True):
-        st.markdown("### Budget Breakdown")
-        for key, value in breakdown.items():
-            st.markdown(f"- **{key}:** {value}")
+    st.markdown("### Budget Breakdown")
+    columns = st.columns(2)
+    entries = list(breakdown.items())
+    for index, (key, value) in enumerate(entries):
+        with columns[index % 2]:
+            with st.container(border=True):
+                st.markdown(f"**{key}**")
+                st.markdown(f"### {value}")
 
 
 def render_plan(plan: dict) -> None:
