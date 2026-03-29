@@ -53,17 +53,17 @@ def render_plan(plan: dict) -> None:
     if summary:
         st.write(summary)
 
-    tags = []
-    for label, value in (
-        ("Style", plan.get("travel_style")),
-        ("Companions", plan.get("companions")),
-        ("Pace", plan.get("pace")),
-        ("Best Time", plan.get("best_time_to_visit")),
-    ):
-        if value:
-            tags.append(f"**{label}:** {value}")
-    if tags:
-        st.markdown(" | ".join(tags))
+    metric_1, metric_2, metric_3, metric_4 = st.columns(4)
+    metric_1.metric("Style", plan.get("travel_style", "-"))
+    metric_2.metric("Companions", plan.get("companions", "-"))
+    metric_3.metric("Pace", plan.get("pace", "-"))
+    metric_4.metric("Best Time", plan.get("best_time_to_visit", "-"))
+
+    why_this_plan = plan.get("why_this_plan")
+    if why_this_plan:
+        with st.container(border=True):
+            st.markdown("### Why This Plan Works")
+            st.write(why_this_plan)
 
     itinerary = plan.get("daily_itinerary", [])
     if itinerary:
@@ -82,46 +82,56 @@ def render_plan(plan: dict) -> None:
     with col1:
         hotels = plan.get("recommended_hotels", [])
         if hotels:
-            st.markdown("### Recommended Hotels")
-            for hotel in hotels:
-                st.markdown(f"- {hotel}")
+            with st.container(border=True):
+                st.markdown("### Recommended Hotels")
+                for hotel in hotels:
+                    st.markdown(f"- {hotel}")
 
         food = plan.get("food_suggestions", [])
         if food:
-            st.markdown("### Food Suggestions")
-            for item in food:
-                st.markdown(f"- {item}")
+            with st.container(border=True):
+                st.markdown("### Food Suggestions")
+                for item in food:
+                    st.markdown(f"- {item}")
 
     with col2:
         breakdown = plan.get("budget_breakdown", {})
         if breakdown:
-            st.markdown("### Budget Breakdown")
-            for key, value in breakdown.items():
-                st.markdown(f"- **{key}:** {value}")
+            with st.container(border=True):
+                st.markdown("### Budget Breakdown")
+                for key, value in breakdown.items():
+                    st.markdown(f"- **{key}:** {value}")
 
         transport = plan.get("local_transport", [])
         if transport:
-            st.markdown("### Local Transport")
-            for item in transport:
-                st.markdown(f"- {item}")
+            with st.container(border=True):
+                st.markdown("### Local Transport")
+                for item in transport:
+                    st.markdown(f"- {item}")
 
     tips = plan.get("travel_tips", [])
     if tips:
-        st.markdown("### Travel Tips")
-        for tip in tips:
-            st.markdown(f"- {tip}")
+        with st.container(border=True):
+            st.markdown("### Travel Tips")
+            for tip in tips:
+                st.markdown(f"- {tip}")
 
     packing = plan.get("packing_checklist", [])
     if packing:
-        st.markdown("### Packing Checklist")
-        for item in packing:
-            st.markdown(f"- {item}")
+        with st.container(border=True):
+            st.markdown("### Packing Checklist")
+            for item in packing:
+                st.markdown(f"- {item}")
 
 
 def render_ui(config: AppConfig) -> None:
     st.title("AI Travel Planner Agent")
     st.markdown(
         "### Build a personalized itinerary with budget, pace, interests, and travel-style inputs"
+    )
+    st.caption(
+        "A portfolio-ready applied AI project that combines LLM planning, preference-based "
+        "personalization, destination imagery, map lookup, and PDF export."
     )
 
     with st.container(border=True):

@@ -21,6 +21,7 @@ It is not presented as a heavy training-based ML system. Instead, it showcases a
 - companion-aware itinerary suggestions
 - interest-based trip customization
 - food preference input
+- explanation of why the generated plan matches the selected preferences
 - day-by-day structured itinerary output
 - destination image gallery using Pexels
 - destination map display using geopy and Streamlit
@@ -86,6 +87,12 @@ python -m streamlit run streamlit_app.py
 - Integrated LLM-based structured response generation with external image and map services
 - Refactored a prototype into a modular Python application with services and utility layers
 - Added PDF export and recruiter-friendly project documentation
+
+## Recommended portfolio extras
+
+- add 2-3 screenshots of the form, generated itinerary, and PDF export
+- deploy the app on Streamlit Cloud and include the live link
+- include the project link in your resume under AI or ML projects
 
 ## Future improvements
 

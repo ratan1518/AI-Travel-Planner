@@ -49,6 +49,7 @@ def _build_prompt(
         "{\n"
         '  "title": "string",\n'
         '  "summary": "string",\n'
+        '  "why_this_plan": "string",\n'
         f'  "travel_style": "{travel_style}",\n'
         f'  "companions": "{companions}",\n'
         f'  "pace": "{pace_label}",\n'
@@ -141,6 +142,10 @@ def format_plan_as_markdown(plan: dict) -> str:
     summary = plan.get("summary")
     if summary:
         lines.extend([summary, ""])
+
+    why_this_plan = plan.get("why_this_plan")
+    if why_this_plan:
+        lines.extend(["## Why This Plan Works", why_this_plan, ""])
 
     for label, key in (
         ("Travel Style", "travel_style"),
