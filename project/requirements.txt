@@ -1,10 +1,6 @@
 streamlit
 openai
-python-dotenv
 requests
 reportlab
 geopy
 pandas
-matplotlib
-folium
-streamlit-folium

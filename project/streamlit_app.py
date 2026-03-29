@@ -1,173 +1,105 @@
 import streamlit as st
-from openai import OpenAI
-import os
-import requests
-from dotenv import load_dotenv
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
-from geopy.geocoders import Nominatim
-import pandas as pd
 
-# ---------- LOAD ENV ----------
-#load_dotenv()
+from config import AppConfig, load_config
+from services.ai import generate_itinerary
+from services.images import get_place_images
+from services.maps import get_location_frame
+from utils.pdf import create_pdf_bytes
 
-# ---------- API KEYS ----------
-OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
-PEXELS_API_KEY = st.secrets["PEXELS_API_KEY"]
 
-if not OPENROUTER_API_KEY:
-    st.error("❌ API key not found. Set OPENROUTER_API_KEY in environment variables.")
-    st.stop()
-
-# ---------- CLIENT ----------
-client = OpenAI(
-    api_key=OPENROUTER_API_KEY,
-    base_url="https://openrouter.ai/api/v1",
-    default_headers={
-        "HTTP-Referer": "https://your-app-name.streamlit.app",
-        "X-Title": "AI Travel Planner"
-    }
-)
-# ---------- SESSION STATE ----------
-if "result" not in st.session_state:
-    st.session_state.result = None
-if "destination" not in st.session_state:
-    st.session_state.destination = None
-
-# ---------- PAGE CONFIG ----------
 st.set_page_config(page_title="AI Travel Planner", layout="wide")
 
-# ---------- UI ----------
-st.title("✈️ AI Travel Planner Agent")
-st.markdown("### 🌍 Plan your perfect trip with AI")
 
-col1, col2, col3 = st.columns(3)
+def initialize_session_state() -> None:
+    if "result" not in st.session_state:
+        st.session_state.result = None
+    if "destination" not in st.session_state:
+        st.session_state.destination = None
 
-with col1:
-    destination = st.text_input("📍 Destination")
 
-with col2:
-    budget = st.number_input("💰 Budget (₹)", min_value=1000)
+def show_place_images(destination: str, api_key: str) -> None:
+    st.subheader(f"{destination} Highlights")
 
-with col3:
-    days = st.number_input("📅 Days", min_value=1)
-
-# ---------- AI FUNCTION ----------
-def generate_itinerary(destination, budget, days):
-    try:
-        day_format = ""
-        for i in range(1, days + 1):
-            day_format += f"\nDay {i}:\n- Place:\n- Place:\n"
-
-        prompt = f"""
-        Plan a {days}-day trip to {destination} within ₹{budget}.
-
-        Format:
-        {day_format}
-
-        Include:
-        Hotels
-        Budget Breakdown
-        Food Suggestions
-        Travel Tips
-        """
-
-        response = client.chat.completions.create(
-            model="openai/gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            timeout=20
-        )
-
-        return response.choices[0].message.content
-
-    except Exception as e:
-        return f"❌ Error: {str(e)}"
-
-# ---------- IMAGE ----------
-def get_place_images(destination):
-    try:
-        if not PEXELS_API_KEY:
-            return []
-
-        url = f"https://api.pexels.com/v1/search?query={destination}&per_page=3"
-        headers = {"Authorization": PEXELS_API_KEY}
-
-        response = requests.get(url, headers=headers, timeout=5)
-        data = response.json()
-
-        return [photo["src"]["large"] for photo in data.get("photos", [])]
-
-    except:
-        return []
-
-def show_place_images(destination):
-    st.subheader(f"📸 {destination} Highlights")
-
-    images = get_place_images(destination)
-
+    images = get_place_images(destination, api_key)
     if not images:
-        st.info("No images available")
+        st.info("No images available.")
         return
 
-    cols = st.columns(len(images))
-    for i, img in enumerate(images):
-        cols[i].image(img, use_container_width=True)
+    columns = st.columns(len(images))
+    for column, image_url in zip(columns, images):
+        column.image(image_url, use_container_width=True)
 
-# ---------- MAP ----------
-def show_simple_map(destination):
-    st.markdown("### 🗺️ Location Map")
 
-    try:
-        geolocator = Nominatim(user_agent="travel_app", timeout=10)
-        location = geolocator.geocode(destination)
+def show_simple_map(destination: str) -> None:
+    st.markdown("### Location Map")
 
-        if location:
-            df = pd.DataFrame({
-                "lat": [location.latitude],
-                "lon": [location.longitude]
-            })
-            st.map(df)
+    location_frame = get_location_frame(destination)
+    if location_frame is None:
+        st.warning("Location not found or map loading failed.")
+        return
+
+    st.map(location_frame)
+
+
+def render_ui(config: AppConfig) -> None:
+    st.title("AI Travel Planner Agent")
+    st.markdown("### Plan your perfect trip with AI")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        destination = st.text_input("Destination")
+
+    with col2:
+        budget = st.number_input("Budget (INR)", min_value=1000, step=1000)
+
+    with col3:
+        days = st.number_input("Days", min_value=1, step=1)
+
+    if st.button("Generate Travel Plan"):
+        if not destination.strip():
+            st.warning("Please enter a destination.")
         else:
-            st.warning("Location not found")
+            with st.spinner("Planning your trip..."):
+                st.session_state.result = generate_itinerary(
+                    destination=destination.strip(),
+                    budget=int(budget),
+                    days=int(days),
+                    config=config,
+                )
+                st.session_state.destination = destination.strip()
 
-    except:
-        st.warning("Map loading failed")
+    if st.session_state.result:
+        st.markdown("## Your Travel Plan")
+        st.markdown(st.session_state.result)
 
-# ---------- PDF ----------
-def create_pdf(text):
-    file_path = "travel_plan.pdf"
-    doc = SimpleDocTemplate(file_path)
+        show_place_images(st.session_state.destination, config.pexels_api_key)
+        show_simple_map(st.session_state.destination)
 
-    styles = getSampleStyleSheet()
-    content = []
+        pdf_bytes = create_pdf_bytes(st.session_state.result)
+        st.download_button(
+            "Download PDF",
+            data=pdf_bytes,
+            file_name="travel_plan.pdf",
+            mime="application/pdf",
+        )
 
-    for line in text.split("\n"):
-        content.append(Paragraph(line, styles["Normal"]))
-        content.append(Spacer(1, 10))
+        st.success("Plan generated successfully.")
 
-    doc.build(content)
-    return file_path
 
-# ---------- BUTTON ----------
-if st.button("✨ Generate Travel Plan"):
-    if not destination:
-        st.warning("⚠️ Please enter a destination")
-    else:
-        with st.spinner("🌍 Planning your trip..."):
-            st.session_state.result = generate_itinerary(destination, budget, days)
-            st.session_state.destination = destination
+def main() -> None:
+    initialize_session_state()
+    config = load_config()
 
-# ---------- OUTPUT ----------
-if st.session_state.result:
-    st.markdown("## 🧳 Your Travel Plan")
-    st.markdown(st.session_state.result)
+    if not config.openrouter_api_key:
+        st.error(
+            "OpenRouter API key not found. Set OPENROUTER_API_KEY in "
+            "Streamlit secrets or environment variables."
+        )
+        st.stop()
 
-    show_place_images(st.session_state.destination)
-    show_simple_map(st.session_state.destination)
+    render_ui(config)
 
-    pdf_file = create_pdf(st.session_state.result)
 
-    with open(pdf_file, "rb") as f:
-        st.download_button("📄 Download PDF", f, "travel_plan.pdf")
-
-    st.success("✅ Plan Generated Successfully!")
+if __name__ == "__main__":
+    main()
