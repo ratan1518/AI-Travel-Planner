@@ -9,37 +9,25 @@ from geopy.geocoders import Nominatim
 import pandas as pd
 
 # ---------- LOAD ENV ----------
-load_dotenv()
+#load_dotenv()
 
-# ---------- SAFE API KEY LOADING ----------
-OPENROUTER_API_KEY = None
-PEXELS_API_KEY = None
+# ---------- API KEYS ----------
+OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
+PEXELS_API_KEY = st.secrets["PEXELS_API_KEY"]
 
-# Try Streamlit secrets (for deployment)
-try:
-    OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
-    PEXELS_API_KEY = st.secrets["PEXELS_API_KEY"]
-except:
-    pass
-
-# Fallback to .env (for local)
 if not OPENROUTER_API_KEY:
-    OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-
-if not PEXELS_API_KEY:
-    PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
-
-# FINAL CHECK
-if not OPENROUTER_API_KEY:
-    st.error("❌ API key not found.\n\n👉 Fix:\n1. Create .env file\n2. Or add Streamlit secrets")
+    st.error("❌ API key not found. Set OPENROUTER_API_KEY in environment variables.")
     st.stop()
 
 # ---------- CLIENT ----------
 client = OpenAI(
     api_key=OPENROUTER_API_KEY,
-    base_url="https://openrouter.ai/api/v1"
+    base_url="https://openrouter.ai/api/v1",
+    default_headers={
+        "HTTP-Referer": "https://your-app-name.streamlit.app",
+        "X-Title": "AI Travel Planner"
+    }
 )
-
 # ---------- SESSION STATE ----------
 if "result" not in st.session_state:
     st.session_state.result = None
