@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.streamlit/secrets.toml
+project/.streamlit/secrets.toml
+travel_plan.pdf
+project/travel_plan.pdf
