@@ -12,28 +12,34 @@ st.set_page_config(page_title="AI Travel Planner", layout="wide")
 
 THEMES = {
     "Light": {
-        "bg": "#f6f7fb",
-        "panel": "rgba(255, 255, 255, 0.82)",
-        "panel_solid": "#ffffff",
-        "text": "#14213d",
-        "muted": "#5c677d",
-        "accent": "#ef8354",
-        "accent_2": "#4f7cac",
-        "border": "rgba(79, 124, 172, 0.18)",
-        "shadow": "0 18px 45px rgba(20, 33, 61, 0.08)",
-        "hero": "linear-gradient(135deg, rgba(239,131,84,0.18), rgba(79,124,172,0.18))",
+        "bg": "#f4efe6",
+        "bg_accent": "#fff8f1",
+        "panel": "rgba(255, 252, 247, 0.92)",
+        "panel_solid": "#fffaf3",
+        "text": "#1d2a38",
+        "muted": "#66768a",
+        "accent": "#c26d3f",
+        "accent_2": "#245c69",
+        "border": "rgba(36, 92, 105, 0.14)",
+        "shadow": "0 20px 50px rgba(29, 42, 56, 0.09)",
+        "hero": "linear-gradient(135deg, #fff6e9 0%, #f4efe6 46%, #edf6f7 100%)",
+        "input_bg": "#fffdf9",
+        "tab_bg": "#f8f2e9",
     },
     "Dark": {
-        "bg": "#10151f",
-        "panel": "rgba(18, 25, 38, 0.82)",
-        "panel_solid": "#141b29",
-        "text": "#f4f7fb",
-        "muted": "#b6c2d9",
-        "accent": "#ffb703",
-        "accent_2": "#6dd3ce",
-        "border": "rgba(255, 255, 255, 0.08)",
-        "shadow": "0 18px 45px rgba(0, 0, 0, 0.28)",
-        "hero": "linear-gradient(135deg, rgba(255,183,3,0.18), rgba(109,211,206,0.18))",
+        "bg": "#0b1220",
+        "bg_accent": "#101a2c",
+        "panel": "rgba(16, 24, 40, 0.92)",
+        "panel_solid": "#101827",
+        "text": "#eef4ff",
+        "muted": "#a8b4c8",
+        "accent": "#f4a261",
+        "accent_2": "#70c1b3",
+        "border": "rgba(255, 255, 255, 0.09)",
+        "shadow": "0 24px 55px rgba(0, 0, 0, 0.34)",
+        "hero": "linear-gradient(135deg, #121b2c 0%, #0f1726 46%, #13283a 100%)",
+        "input_bg": "#0f1726",
+        "tab_bg": "#132033",
     },
 }
 
@@ -60,11 +66,26 @@ def apply_custom_theme(theme_name: str) -> None:
             font-family: 'Manrope', sans-serif;
         }}
 
+        :root {{
+            --bg: {theme["bg"]};
+            --bg-accent: {theme["bg_accent"]};
+            --panel: {theme["panel"]};
+            --panel-solid: {theme["panel_solid"]};
+            --text: {theme["text"]};
+            --muted: {theme["muted"]};
+            --accent: {theme["accent"]};
+            --accent-2: {theme["accent_2"]};
+            --border: {theme["border"]};
+            --shadow: {theme["shadow"]};
+            --input-bg: {theme["input_bg"]};
+            --tab-bg: {theme["tab_bg"]};
+        }}
+
         .stApp {{
             background:
-                radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 28%),
-                radial-gradient(circle at bottom right, rgba(255,255,255,0.05), transparent 24%),
-                {theme["bg"]};
+                radial-gradient(circle at 12% 14%, rgba(255,255,255,0.08), transparent 22%),
+                radial-gradient(circle at 88% 18%, rgba(255,255,255,0.05), transparent 20%),
+                linear-gradient(180deg, var(--bg-accent), var(--bg));
             color: {theme["text"]};
         }}
 
@@ -72,41 +93,65 @@ def apply_custom_theme(theme_name: str) -> None:
             background: transparent;
         }}
 
+        [data-testid="stToolbar"] {{
+            right: 1rem;
+        }}
+
+        [data-testid="stAppViewBlockContainer"] {{
+            padding-top: 2rem;
+            max-width: 1180px;
+        }}
+
         [data-testid="stSidebar"] {{
-            background: {theme["panel_solid"]};
-            border-right: 1px solid {theme["border"]};
+            background: var(--panel-solid);
+            border-right: 1px solid var(--border);
+        }}
+
+        [data-testid="stSidebar"] > div:first-child {{
+            background: linear-gradient(180deg, var(--panel-solid), var(--bg));
         }}
 
         [data-testid="stSidebar"] * {{
-            color: {theme["text"]};
+            color: var(--text);
+        }}
+
+        h1, h2, h3, h4, h5, h6 {{
+            color: var(--text) !important;
+            letter-spacing: -0.02em;
+        }}
+
+        p, li, label, span {{
+            color: var(--text);
+        }}
+
+        .stMarkdown a {{
+            color: var(--accent);
         }}
 
         [data-testid="stMetric"] {{
-            background: {theme["panel"]};
-            border: 1px solid {theme["border"]};
-            border-radius: 18px;
-            padding: 0.9rem 1rem;
-            box-shadow: {theme["shadow"]};
-            backdrop-filter: blur(12px);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 1rem 1rem;
+            box-shadow: var(--shadow);
         }}
 
         [data-testid="stMetricLabel"], [data-testid="stMetricValue"] {{
-            color: {theme["text"]};
+            color: var(--text);
         }}
 
-        .hero-card, .glass-card {{
-            background: {theme["panel"]};
-            border: 1px solid {theme["border"]};
-            box-shadow: {theme["shadow"]};
-            border-radius: 24px;
-            backdrop-filter: blur(14px);
-            animation: fadeUp 0.65s ease both;
+        .hero-card, .glass-card, .section-card, .feature-card {{
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            border-radius: 28px;
+            animation: fadeUp 0.55s ease both;
         }}
 
         .hero-card {{
             background-image: {theme["hero"]};
-            padding: 1.8rem 1.8rem 1.4rem 1.8rem;
-            margin-bottom: 1.1rem;
+            padding: 2.4rem 2.3rem 2rem 2.3rem;
+            margin-bottom: 1.2rem;
             overflow: hidden;
             position: relative;
         }}
@@ -114,13 +159,13 @@ def apply_custom_theme(theme_name: str) -> None:
         .hero-card::after {{
             content: "";
             position: absolute;
-            right: -60px;
-            top: -50px;
-            width: 190px;
-            height: 190px;
+            right: -30px;
+            top: -30px;
+            width: 170px;
+            height: 170px;
             border-radius: 50%;
-            background: linear-gradient(135deg, {theme["accent"]}22, {theme["accent_2"]}22);
-            filter: blur(8px);
+            background: linear-gradient(135deg, {theme["accent"]}28, {theme["accent_2"]}22);
+            filter: blur(2px);
         }}
 
         .hero-kicker {{
@@ -129,56 +174,52 @@ def apply_custom_theme(theme_name: str) -> None:
             font-weight: 800;
             letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: {theme["accent"]};
+            color: var(--accent);
             margin-bottom: 0.9rem;
         }}
 
         .hero-title {{
             font-size: clamp(2rem, 3.4vw, 3.6rem);
-            line-height: 1.03;
+            line-height: 0.98;
             font-weight: 800;
-            max-width: 760px;
+            max-width: 820px;
             margin: 0 0 0.75rem 0;
-            color: {theme["text"]};
+            color: var(--text);
         }}
 
         .hero-copy {{
             font-size: 1rem;
-            line-height: 1.7;
-            color: {theme["muted"]};
-            max-width: 760px;
-            margin-bottom: 1rem;
+            line-height: 1.8;
+            color: var(--muted);
+            max-width: 720px;
+            margin-bottom: 1.2rem;
         }}
 
         .chip-row {{
             display: flex;
             flex-wrap: wrap;
-            gap: 0.55rem;
-            margin-top: 0.2rem;
+            gap: 0.6rem;
+            margin-top: 0.25rem;
         }}
 
         .chip {{
             border-radius: 999px;
-            padding: 0.45rem 0.85rem;
-            border: 1px solid {theme["border"]};
-            background: rgba(255,255,255,0.06);
-            color: {theme["text"]};
-            font-size: 0.85rem;
+            padding: 0.48rem 0.88rem;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            font-size: 0.84rem;
             font-weight: 700;
         }}
 
         .section-card {{
-            background: {theme["panel"]};
-            border: 1px solid {theme["border"]};
-            border-radius: 20px;
-            padding: 1rem 1.1rem;
-            box-shadow: {theme["shadow"]};
-            backdrop-filter: blur(12px);
-            animation: fadeUp 0.7s ease both;
+            border-radius: 24px;
+            padding: 1.15rem 1.2rem;
+            margin-bottom: 1rem;
         }}
 
         .mini-title {{
-            color: {theme["muted"]};
+            color: var(--muted);
             font-size: 0.82rem;
             text-transform: uppercase;
             letter-spacing: 0.12em;
@@ -189,40 +230,36 @@ def apply_custom_theme(theme_name: str) -> None:
         .info-grid {{
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 0.8rem;
-            margin: 0.8rem 0 1.1rem 0;
+            gap: 0.9rem;
+            margin: 0.9rem 0 1.2rem 0;
         }}
 
-        .info-card {{
-            background: {theme["panel"]};
-            border: 1px solid {theme["border"]};
-            border-radius: 18px;
-            padding: 0.95rem;
-            box-shadow: {theme["shadow"]};
+        .feature-card {{
+            padding: 1rem 1rem 1.1rem 1rem;
             min-height: 118px;
         }}
 
-        .info-card h4 {{
+        .feature-card h4 {{
             margin: 0 0 0.45rem 0;
-            color: {theme["text"]};
+            color: var(--text);
             font-size: 1rem;
         }}
 
-        .info-card p {{
+        .feature-card p {{
             margin: 0;
-            color: {theme["muted"]};
+            color: var(--muted);
             line-height: 1.55;
             font-size: 0.95rem;
         }}
 
         .stButton > button, .stDownloadButton > button {{
             width: 100%;
-            border-radius: 16px;
+            border-radius: 18px;
             border: 1px solid transparent;
             color: #0f172a;
             font-weight: 800;
-            padding: 0.8rem 1rem;
-            background: linear-gradient(135deg, {theme["accent"]}, {theme["accent_2"]});
+            padding: 0.85rem 1rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
             transition: transform 0.18s ease, box-shadow 0.18s ease;
         }}
@@ -232,31 +269,123 @@ def apply_custom_theme(theme_name: str) -> None:
             box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
         }}
 
-        .stTextInput input, .stNumberInput input, .stSelectbox div[data-baseweb="select"],
-        .stMultiSelect div[data-baseweb="select"] {{
+        .stTextInput input, .stNumberInput input {{
+            border-radius: 16px !important;
+            background: var(--input-bg) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            box-shadow: none !important;
+        }}
+
+        .stTextInput input::placeholder,
+        .stNumberInput input::placeholder {{
+            color: var(--muted) !important;
+        }}
+
+        [data-testid="stNumberInput"] {{
+            background: transparent !important;
+        }}
+
+        [data-testid="stNumberInput"] button {{
+            background: var(--input-bg) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border) !important;
             border-radius: 14px !important;
+            box-shadow: none !important;
+        }}
+
+        [data-testid="stNumberInput"] button:hover {{
+            border-color: var(--accent) !important;
+            color: var(--accent) !important;
+        }}
+
+        .stSelectbox div[data-baseweb="select"],
+        .stMultiSelect div[data-baseweb="select"] {{
+            border-radius: 16px !important;
+            background: var(--input-bg) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: none !important;
+        }}
+
+        .stSelectbox div[data-baseweb="select"] > div,
+        .stMultiSelect div[data-baseweb="select"] > div {{
+            color: var(--text) !important;
+            background: var(--input-bg) !important;
+        }}
+
+        .stSelectbox svg, .stMultiSelect svg {{
+            fill: var(--text) !important;
+        }}
+
+        .stSlider [data-baseweb="slider"] {{
+            padding-top: 0.5rem;
+        }}
+
+        .stRadio > div {{
+            gap: 0.6rem;
+        }}
+
+        .stRadio label {{
+            background: var(--input-bg);
+            padding: 0.55rem 0.8rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
         }}
 
         .stTabs [data-baseweb="tab-list"] {{
             gap: 0.5rem;
+            margin-bottom: 0.8rem;
         }}
 
         .stTabs [data-baseweb="tab"] {{
             border-radius: 999px;
-            padding: 0.5rem 1rem;
-            background: {theme["panel"]};
-            border: 1px solid {theme["border"]};
+            padding: 0.52rem 1rem;
+            background: var(--tab-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
         }}
 
-        .stExpander {{
-            border: 1px solid {theme["border"]};
-            border-radius: 18px;
-            background: {theme["panel"]};
+        .stTabs [aria-selected="true"] {{
+            background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+            color: #0f172a !important;
+            border-color: transparent !important;
+            font-weight: 800 !important;
+        }}
+
+        .stExpander, [data-testid="stExpander"] {{
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel);
             overflow: hidden;
+            box-shadow: var(--shadow);
         }}
 
-        div[data-testid="stCaptionContainer"] p, p, li, label {{
-            color: {theme["text"]};
+        details[data-testid="stExpander"] summary,
+        .streamlit-expanderHeader {{
+            background: var(--panel-solid) !important;
+            color: var(--text) !important;
+            border-bottom: 1px solid var(--border) !important;
+        }}
+
+        details[data-testid="stExpander"] summary:hover,
+        .streamlit-expanderHeader:hover {{
+            color: var(--accent) !important;
+        }}
+
+        details[data-testid="stExpander"] > div {{
+            background: var(--panel) !important;
+        }}
+
+        [data-testid="stAlert"] {{
+            border-radius: 18px;
+        }}
+
+        div[data-testid="stCaptionContainer"] p, small {{
+            color: var(--muted) !important;
+        }}
+
+        .block-container {{
+            padding-top: 1.5rem;
         }}
 
         @keyframes fadeUp {{
@@ -279,17 +408,17 @@ def render_hero() -> None:
     st.markdown(
         """
         <div class="hero-card">
-            <div class="hero-kicker">AI Travel Experience</div>
-            <div class="hero-title">Plan smarter trips with a premium AI travel dashboard.</div>
+            <div class="hero-kicker">Curated Journey Design</div>
+            <div class="hero-title">A premium AI travel planner with a calmer, more refined interface.</div>
             <div class="hero-copy">
-                Personalize your itinerary by travel style, pace, interests, and companions.
-                Explore a cleaner breakdown of your trip, then export a polished PDF in one click.
+                Shape the trip around style, pace, interests, and company. Review your plan through
+                elegant sections, then export a polished report when it feels right.
             </div>
             <div class="chip-row">
-                <span class="chip">Dark / Light Mode</span>
-                <span class="chip">Personalized Itineraries</span>
-                <span class="chip">Maps + Visuals</span>
-                <span class="chip">PDF Export</span>
+                <span class="chip">Adaptive Themes</span>
+                <span class="chip">Curated Itineraries</span>
+                <span class="chip">Visual Discovery</span>
+                <span class="chip">Styled Export</span>
             </div>
         </div>
         """,
@@ -301,17 +430,17 @@ def render_intro_grid() -> None:
     st.markdown(
         """
         <div class="info-grid">
-            <div class="info-card">
-                <h4>Preference-Aware</h4>
-                <p>The itinerary adapts to budget, travel style, trip pace, and food choices.</p>
+            <div class="feature-card">
+                <h4>Preference-Led Planning</h4>
+                <p>The itinerary shifts with budget, travel style, pace, and food choices.</p>
             </div>
-            <div class="info-card">
-                <h4>Structured Output</h4>
-                <p>Daily plans, budget breakdowns, local transport, and packing suggestions stay readable.</p>
+            <div class="feature-card">
+                <h4>Editorial Layout</h4>
+                <p>Daily plans, budget details, travel tips, and transport stay organized and readable.</p>
             </div>
-            <div class="info-card">
-                <h4>Portfolio Ready</h4>
-                <p>A polished interface makes the project feel more like a product and less like a demo.</p>
+            <div class="feature-card">
+                <h4>Recruiter-Friendly Polish</h4>
+                <p>The interface now feels closer to a finished product than a default prototype.</p>
             </div>
         </div>
         """,
@@ -346,6 +475,36 @@ def render_bullet_section(title: str, items: list[str]) -> None:
         st.markdown(f"### {title}")
         for item in items:
             st.markdown(f"- {item}")
+
+
+def render_hotel_section(hotels: list) -> None:
+    if not hotels:
+        return
+
+    st.markdown("### Recommended Hotels")
+    for hotel in hotels:
+        if isinstance(hotel, dict):
+            near_places = hotel.get("near_places", [])
+            near_places_text = ", ".join(near_places) if near_places else "Selected itinerary areas"
+            st.markdown(
+                f"""
+                <div class="section-card">
+                    <div class="mini-title">{hotel.get("area", "Recommended Area")}</div>
+                    <div style="font-size:1.08rem; font-weight:800; margin-bottom:0.35rem;">{hotel.get("name", "Hotel")}</div>
+                    <div style="color:var(--muted); margin-bottom:0.35rem;">
+                        <strong>Price range:</strong> {hotel.get("price_range", "Budget matched")}
+                    </div>
+                    <div style="color:var(--muted); margin-bottom:0.35rem;">
+                        <strong>Near:</strong> {near_places_text}
+                    </div>
+                    <div style="line-height:1.65;">{hotel.get("why_it_matches", "")}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            with st.container(border=True):
+                st.markdown(f"- {hotel}")
 
 
 def render_budget_section(breakdown: dict) -> None:
@@ -395,7 +554,7 @@ def render_plan(plan: dict) -> None:
     with overview_tab:
         col1, col2 = st.columns(2)
         with col1:
-            render_bullet_section("Recommended Hotels", plan.get("recommended_hotels", []))
+            render_hotel_section(plan.get("recommended_hotels", []))
             render_bullet_section("Food Suggestions", plan.get("food_suggestions", []))
         with col2:
             render_budget_section(plan.get("budget_breakdown", {}))
@@ -499,11 +658,11 @@ def render_ui(config: AppConfig) -> None:
         st.markdown(
             """
             <div class="glass-card" style="padding:1.1rem 1.2rem; margin-bottom:1rem;">
-                <div class="mini-title">Experience</div>
-                <div style="font-size:1.1rem; font-weight:800;">Create a detailed travel plan in one flow</div>
-                <div style="margin-top:0.45rem; color:inherit; opacity:0.82;">
-                    Tune the controls from the sidebar, generate a personalized itinerary,
-                    and explore the destination through organized tabs.
+                <div class="mini-title">Planning Flow</div>
+                <div style="font-size:1.1rem; font-weight:800;">Create a travel brief, then review a polished itinerary.</div>
+                <div style="margin-top:0.45rem; color:inherit; opacity:0.82; line-height:1.7;">
+                    Use the sidebar to define the trip. The planner turns those inputs into a structured
+                    result that feels easier to scan, compare, and present.
                 </div>
             </div>
             """,
@@ -513,12 +672,12 @@ def render_ui(config: AppConfig) -> None:
         st.markdown(
             """
             <div class="glass-card" style="padding:1.1rem 1.2rem; margin-bottom:1rem;">
-                <div class="mini-title">Highlights</div>
+                <div class="mini-title">Design Notes</div>
                 <div class="chip-row">
-                    <span class="chip">Animated cards</span>
-                    <span class="chip">Theme toggle</span>
-                    <span class="chip">Tabbed results</span>
-                    <span class="chip">Styled PDF</span>
+                    <span class="chip">Elegant spacing</span>
+                    <span class="chip">Coherent light mode</span>
+                    <span class="chip">Focused tabs</span>
+                    <span class="chip">Premium export</span>
                 </div>
             </div>
             """,

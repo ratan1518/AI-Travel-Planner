@@ -45,6 +45,10 @@ def _build_prompt(
         f"Interests: {interests_text}\n"
         f"Pace: {pace_label}\n"
         f"Food preference: {food_preference}\n\n"
+        "Use real place names for sightseeing locations.\n"
+        "For hotels, suggest real hotels that plausibly exist in the destination, match the overall budget, "
+        "and stay close to the main places or areas mentioned in the itinerary.\n"
+        "If you are not confident, return fewer hotel suggestions rather than inventing details.\n\n"
         "Return only valid JSON with this exact schema:\n"
         "{\n"
         '  "title": "string",\n'
@@ -57,7 +61,15 @@ def _build_prompt(
         '  "daily_itinerary": [\n'
         f"    {itinerary_template}\n"
         "  ],\n"
-        '  "recommended_hotels": ["string"],\n'
+        '  "recommended_hotels": [\n'
+        "    {\n"
+        '      "name": "string",\n'
+        '      "area": "string",\n'
+        '      "price_range": "string",\n'
+        '      "near_places": ["string"],\n'
+        '      "why_it_matches": "string"\n'
+        "    }\n"
+        "  ],\n"
         '  "budget_breakdown": {\n'
         '    "Stay": "string",\n'
         '    "Food": "string",\n'
@@ -171,8 +183,26 @@ def format_plan_as_markdown(plan: dict) -> str:
                 lines.append(f"- Estimated Cost: {day['estimated_cost']}")
             lines.append("")
 
+    hotels = plan.get("recommended_hotels", [])
+    if hotels:
+        lines.append("## Recommended Hotels")
+        for hotel in hotels:
+            if isinstance(hotel, dict):
+                lines.append(f"- {hotel.get('name', 'Hotel')}")
+                if hotel.get("area"):
+                    lines.append(f"  Area: {hotel['area']}")
+                if hotel.get("price_range"):
+                    lines.append(f"  Price Range: {hotel['price_range']}")
+                near_places = hotel.get("near_places", [])
+                if near_places:
+                    lines.append(f"  Near: {', '.join(near_places)}")
+                if hotel.get("why_it_matches"):
+                    lines.append(f"  Why it matches: {hotel['why_it_matches']}")
+            else:
+                lines.append(f"- {hotel}")
+        lines.append("")
+
     for heading, key in (
-        ("Recommended Hotels", "recommended_hotels"),
         ("Food Suggestions", "food_suggestions"),
         ("Local Transport", "local_transport"),
         ("Travel Tips", "travel_tips"),
